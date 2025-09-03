@@ -77,6 +77,12 @@ export const createCategory = async (req, res) => {
   let thumbnailPublicID = "";
 
   try {
+    const slugExist = await Category.findOne({ slug: slug });
+
+    if (slugExist) {
+      return res.status(400).json({ message: "Slug already exist" });
+    }
+
     if (!name || !slug) {
       return res
         .status(400)
@@ -126,6 +132,12 @@ export const updateCategoryById = async (req, res) => {
   const updatedFields = req.body;
 
   try {
+    const category = await Category.findOne({ _id: categoryId });
+    const slugExist = await Category.findOne({ slug: updatedFields.slug });
+
+    if (slugExist && slugExist.slug !== category.slug) {
+      return res.status(400).json({ message: "Slug already exist" });
+    }
     if (!updatedFields.name || !updatedFields.slug) {
       return res
         .status(400)
@@ -135,7 +147,6 @@ export const updateCategoryById = async (req, res) => {
     let isNewImage = !updatedFields.thumbnail.publicId;
 
     if (isNewImage) {
-      const category = await Category.findOne({ _id: categoryId });
       const toDeleteImage = category.thumbnail.publicId;
       let deleteResult = null;
       if (toDeleteImage) {
@@ -145,7 +156,6 @@ export const updateCategoryById = async (req, res) => {
       if (!deleteResult.success) {
         return res.status(400).json({ message: deleteResult.error });
       }
-
 
       const uploadResult = await uploadImage(
         updatedFields.thumbnail.url,
