@@ -26,9 +26,9 @@ const Categories = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(()=>{
+  useEffect(() => {
     getCategories();
-  },[])
+  }, []);
 
   const totalPages = useMemo(() => {
     return Math.ceil(categories.length / selectedPageSize?.value);
@@ -48,17 +48,29 @@ const Categories = () => {
     return categories.slice(start, end);
   }, [start, end, categories]);
 
-  const image =true
-
-
   const headers = [
-    { label: "", className: "w-[75px]" },
-    { label: "Image", className: "w-[100px]" },
-    { label: "Category Name", className: "w-[200px]" },
-    { label: "Description", className: "w-[250px]" },
-    { label: "Slug", className: "w-[200px]" },
-    { label: "Products", className: "!text-center" },
-    { label: "", className: "w-[150px]" },
+    { key: "select", label: "", className: "w-[75px]", visible: true },
+    { key: "image", label: "Image", className: "w-[100px]", visible: true },
+    {
+      key: "name",
+      label: "Category Name",
+      className: "w-[200px]",
+      visible: true,
+    },
+    {
+      key: "description",
+      label: "Description",
+      className: "w-[250px]",
+      visible: true,
+    },
+    { key: "slug", label: "Slug", className: "w-[200px]", visible: true },
+    {
+      key: "products",
+      label: "Products",
+      className: "!text-center",
+      visible: true,
+    },
+    { key: "actions", label: "", className: "w-[150px]", visible: true },
   ];
 
   const pageSizeOptions = [
@@ -68,6 +80,14 @@ const Categories = () => {
     { label: "20", value: 20 },
     { label: "25", value: 25 },
   ];
+
+  const [tableHeaders, setTableHeaders] = useState(headers);
+
+  const toggleColumn = (key) => {
+    setTableHeaders((prev) =>
+      prev.map((h) => (h.key === key ? { ...h, visible: !h.visible } : h))
+    );
+  };
 
   return (
     <div className="bg-base-100 p-6 rounded-lg space-y-5 h-full">
@@ -116,18 +136,28 @@ const Categories = () => {
                     Toggle Columns
                   </Title>
                   <div className="grid grid-cols-2 gap-5">
-                    <Checkbox defaultChecked label="Image" />
-                    <Checkbox defaultChecked label="Description" />
-                    <Checkbox defaultChecked label="Products" />
-                    <Checkbox defaultChecked label="Category Name" />
-                    <Checkbox defaultChecked label="Slug" />
+                    {tableHeaders
+                      .filter((h) => h.key !== "select" && h.key !== "actions") // skip checkbox + actions
+                      .map((header) => (
+                        <Checkbox
+                          key={header.key}
+                          checked={header.visible}
+                          onChange={() => toggleColumn(header.key)}
+                          label={header.label}
+                        />
+                      ))}
                   </div>
                 </Popover.Content>
               </Popover>
             </div>
           </div>
           {/* <CategoryList /> */}
-          {slicedCategories && <Table data={slicedCategories} headers={headers} />}
+          {slicedCategories && (
+            <Table
+              data={slicedCategories}
+              headers={tableHeaders.filter((h) => h.visible)}
+            />
+          )}
           {/* Pagination */}
           <Pagination
             pageSizeOptions={pageSizeOptions}
