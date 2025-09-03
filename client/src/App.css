@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 255 255 255;
+    --foreground: 34 34 34;
+    --primary-default: 37 99 235;
+    --primary-foreground: 255 255 255;
+  }
+
+  .dark {
+    --background: 17 17 17;
+    --foreground: 229 229 229;
+    --primary-default: 59 130 246;
+    --primary-foreground: 17 17 17;
+  }
+
+  body {
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+  }
+}
