@@ -1,11 +1,11 @@
 // Routing
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 // Icons
 import { CloudUpload, Trash2 } from "lucide-react";
 
 // Hooks
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 
 // rizz ui
 import { Textarea, Input, Button, Switch } from "rizzui";
@@ -19,18 +19,23 @@ import toast from "react-hot-toast";
 // Stores
 import { useCategoryStore } from "../store/useCategoryStore";
 
-const CreateCategory = () => {
+const EditCategory = () => {
+  const { categoryId } = useParams();
   const {
-    isCreatingCategory,
-    createCategory,
+    selectedCategory,
+    getCategoryById,
+    updateCategoryById,
+    isUpdatingCategory,
     getParentCategories,
     parentCategories,
     getSubCategories,
     subCategories,
     setSubCategories,
   } = useCategoryStore();
+  const closeModal = useRef();
   const selectPic = useRef();
   const [errors, setErrors] = useState({});
+  const [] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -40,9 +45,35 @@ const CreateCategory = () => {
     metaTitle: "",
     metaDescription: "",
     canonicalUrl: "",
-    thumbnail: "",
+    thumbnail: {
+      url: "",
+      publicId: "",
+    },
     status: true,
   });
+
+  useEffect(() => {
+    getCategoryById(categoryId);
+  }, [categoryId]);
+
+  useEffect(() => {
+    if (!selectedCategory) return;
+    setFormData({
+      name: selectedCategory.name || "",
+      slug: selectedCategory.slug || "",
+      parent_category: selectedCategory.parent_category || null,
+      sub_parent: selectedCategory.sub_parent || null,
+      description: selectedCategory.description || "",
+      metaTitle: selectedCategory.metaTitle || "",
+      metaDescription: selectedCategory.metaDescription || "",
+      canonicalUrl: selectedCategory.canonicalUrl || "",
+      thumbnail: selectedCategory.thumbnail || {
+        url: "",
+        publicId: "",
+      },
+      status: selectedCategory.status || true,
+    });
+  }, [selectedCategory]);
 
   useEffect(() => {
     getParentCategories();
@@ -74,8 +105,11 @@ const CreateCategory = () => {
     e.preventDefault();
     if (!validateForm()) return;
     // submit logic here
-    const createCategorySuccess = await createCategory(formData);
-    if (!createCategorySuccess) return;
+    const updateCategorySuccess = await updateCategoryById(formData);
+
+    if (!updateCategorySuccess) return;
+
+    closeModal.current.click();
     setFormData({
       name: "",
       slug: "",
@@ -91,7 +125,6 @@ const CreateCategory = () => {
   };
 
   const handleSelectImage = (imageFile) => {
-    console.log(imageFile);
     const supportedTypes = ["image/jpeg", "image/png", "image/webp"];
 
     if (!supportedTypes.includes(imageFile.type)) {
@@ -109,7 +142,7 @@ const CreateCategory = () => {
     reader.onloadend = () => {
       setFormData({
         ...formData,
-        thumbnail: reader.result, // `reader.result` contains the base64 image
+        thumbnail: { url: reader.result }, // `reader.result` contains the base64 image
       });
     };
 
@@ -122,7 +155,7 @@ const CreateCategory = () => {
   const closeImagePreview = () => {
     setFormData({
       ...formData,
-      thumbnail: null, // `reader.result` contains the base64 image
+      thumbnail: { url: "", publicId: "" },
     });
 
     // Reset file input so same file can be selected again
@@ -138,30 +171,24 @@ const CreateCategory = () => {
     setFormData({ ...formData, sub_parent: value });
   };
 
-  const options = [
-    { label: "Apple 🍎", value: "apple" },
-    { label: "Banana 🍌", value: "banana" },
-    { label: "Cherry 🍒", value: "cherry" },
-  ];
-
   return (
     <div className="bg-base-100 p-6 rounded-lg space-y-5 h-full">
       <div className="flex justify-between items-center">
         <div>
-          <div className="font-bold text-2xl mb-2">Create A Category</div>
+          <div className="font-bold text-2xl mb-2">Edit A Category</div>
           <div className="breadcrumbs text-sm font-medium text-base-content/80">
             <ul>
               <li>
                 <Link to="/categories">Categories</Link>
               </li>
-              <li className="opacity-85">Create</li>
+              <li className="opacity-85">Edit</li>
             </ul>
           </div>
         </div>
         <div>
-          <Button variant="outline">
-            <Link to="/categories">Cancel</Link>
-          </Button>
+          <Link ref={closeModal} to="/categories">
+            <Button variant="outline">Cancel</Button>
+          </Link>
         </div>
       </div>
 
@@ -309,7 +336,7 @@ const CreateCategory = () => {
               <CloudUpload className="size-8" />
               <div className="font-medium">Select Image</div>
             </div>
-            {formData.thumbnail && (
+            {formData.thumbnail?.url && (
               <div className="relative avatar bg-base-200 w-full mt-3 rounded-md justify-center">
                 <div
                   onClick={closeImagePreview}
@@ -318,7 +345,7 @@ const CreateCategory = () => {
                   <Trash2 className="w-3 h-3 absolute inset-0 m-auto text-white" />
                 </div>
                 <div className="w-36">
-                  <img className="select-none" src={formData.thumbnail} />
+                  <img className="select-none" src={formData.thumbnail?.url} />
                 </div>
               </div>
             )}
@@ -347,11 +374,11 @@ const CreateCategory = () => {
 
         <div className="flex justify-end">
           <Button
-            isLoading={isCreatingCategory}
+            isLoading={isUpdatingCategory}
             type="submit"
             color="secondary"
           >
-            Create Category
+            Save Category
           </Button>
         </div>
       </form>
@@ -359,4 +386,4 @@ const CreateCategory = () => {
   );
 };
 
-export default CreateCategory;
+export default EditCategory;

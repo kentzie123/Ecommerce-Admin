@@ -24,7 +24,7 @@ const Sidebar = () => {
   const { sidebarOpen } = useSidebarStore();
   return (
     <div
-      className={`z-[52] bg-base-100 h-full border-r border-[rgba(0,0,0,0.1)] py-2 ${
+      className={`fixed top-0 left-0 z-[52] bg-base-100 min-h-[100vh] border-r border-[rgba(0,0,0,0.1)] py-2 ${
         sidebarOpen ? "w-[20%] px-4" : "w-0"
       } transition-all`}
     >

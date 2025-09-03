@@ -10,19 +10,13 @@ import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import CreateCategory from "./pages/CreateCategory";
+import EditCategory from "./pages/EditCategory";
 import Products from "./pages/Products";
 
 // Toast
 import { Toaster } from "react-hot-toast";
 
-// Stores
-import { useCategoryStore } from "./store/useCategoryStore";
-
-// Hooks
-import { useEffect } from "react";
-
 function App() {
-
   return (
     <div data-theme="light">
       <Toaster />
@@ -31,6 +25,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/create" element={<CreateCategory />} />
+          <Route path="/categories/edit/:categoryId" element={<EditCategory />} />
           <Route path="/products" element={<Products />} />
         </Route>
       </Routes>

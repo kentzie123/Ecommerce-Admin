@@ -19,7 +19,7 @@ import { useCategoryStore } from "../store/useCategoryStore";
 import { useState, useMemo, useEffect } from "react";
 
 const Categories = () => {
-  const { getCategories, categories } = useCategoryStore();
+  const { getCategories, categories, setSelectedCategory } = useCategoryStore();
   const [selectedPageSize, setSelectedPageSize] = useState({
     label: "10",
     value: 10,
@@ -156,6 +156,8 @@ const Categories = () => {
             <Table
               data={slicedCategories}
               headers={tableHeaders.filter((h) => h.visible)}
+              getSelectedCellData={setSelectedCategory}
+              editModalRoute="/categories/edit"
             />
           )}
           {/* Pagination */}

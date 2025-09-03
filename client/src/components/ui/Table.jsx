@@ -9,10 +9,13 @@ import {
   Text,
 } from "rizzui";
 
+// Routing
+import { Link } from "react-router-dom";
+
 // icons
 import { Pencil, Trash2 } from "lucide-react";
 
-export const Table = ({ data = [], headers = [] }) => {
+export const Table = ({ data = [], headers = [], editModalRoute }) => {
   return (
     <div>
       <div className="overflow-hidden rounded-md text-sm">
@@ -51,7 +54,7 @@ export const Table = ({ data = [], headers = [] }) => {
                           <div className="avatar">
                             <div className="mask mask-squircle h-12 w-12">
                               <img
-                                src={row.image || "/placeholder.png"}
+                                src={row.thumbnail.url || "/category_default.png"}
                                 alt={row.name || "category"}
                               />
                             </div>
@@ -68,9 +71,11 @@ export const Table = ({ data = [], headers = [] }) => {
                           className="flex items-center gap-3"
                         >
                           <Tooltip content="Edit" color="invert">
-                            <Button size="sm" variant="outline">
-                              <Pencil className="size-4 text-base-content/80" />
-                            </Button>
+                            <Link to={`${editModalRoute}/${row._id}`}>
+                              <Button size="sm" variant="outline">
+                                <Pencil className="size-4 text-base-content/80" />
+                              </Button>
+                            </Link>
                           </Tooltip>
                           <Popover>
                             <Popover.Trigger>

@@ -13,9 +13,9 @@ const Layout = () => {
   return (
     <div className="h-full">
       <Topnav />
-      <div className="flex transition">
+      <div className="flex transition-all h-full">
         <Sidebar />
-        <div className={` pt-[60px]  ${sidebarOpen ? "w-[80%]" : "w-[100%]"}`}>
+        <div className={`pt-[60px]  ${sidebarOpen ? "pl-[20%]" : "pl-0"} w-[100%]`}>
           <Outlet />
         </div>
       </div>

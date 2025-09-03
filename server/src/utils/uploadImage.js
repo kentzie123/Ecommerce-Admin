@@ -7,7 +7,7 @@ export const uploadImage = async (filePath, folder) => {
       folder: `ecommerce-admin/${folder}`,
     });
     
-    return { success: true, url: result.secure_url };
+    return { success: true, url: result.secure_url, publicId: result.public_id };
   } catch (error) {
     console.error('Upload failed:', error.message);
     return { success: false, error: error.message };

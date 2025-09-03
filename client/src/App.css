@@ -24,5 +24,6 @@ body {
   body {
     background-color: rgb(var(--background));
     color: rgb(var(--foreground));
+    min-height: 100vh;
   }
 }

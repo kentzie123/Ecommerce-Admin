@@ -8,12 +8,14 @@ import toast from "react-hot-toast";
 
 export const useCategoryStore = create((set, get) => ({
   isCreatingCategory: false,
+  isUpdatingCategory: false,
   categories: [],
   parentCategories: [],
   subCategories: [],
+  selectedCategory: null,
 
   setSubCategories: (data) => {
-    set({subCategories: data});
+    set({ subCategories: data });
   },
 
   getCategories: async () => {
@@ -22,6 +24,16 @@ export const useCategoryStore = create((set, get) => ({
       set({ categories: categories.data });
     } catch (error) {
       console.log(error);
+    }
+  },
+
+  getCategoryById: async (categoryId) => {
+    try {
+      const selectedCategory = await api.get(`/categories/by-id/${categoryId}`);
+      
+      set({ selectedCategory: selectedCategory.data });
+    } catch (error) {
+      console.error(error);
     }
   },
 
@@ -34,7 +46,7 @@ export const useCategoryStore = create((set, get) => ({
       }));
       set({ parentCategories: formatted });
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   },
 
@@ -47,11 +59,10 @@ export const useCategoryStore = create((set, get) => ({
         label: cat.name,
         value: cat._id,
       }));
-      console.log(formatted);
-      
+
       set({ subCategories: formatted });
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   },
 
@@ -62,11 +73,30 @@ export const useCategoryStore = create((set, get) => ({
       toast.success("Created category successfully");
       return true;
     } catch (error) {
-      console.log(error);
-      toast.error("sample error");
+      console.error(error);
+      toast.error(error?.response?.data?.message);
       return false;
     } finally {
       set({ isCreatingCategory: false });
+    }
+  },
+
+  updateCategoryById: async (updatedFields) => {
+    try {
+      set({ isUpdatingCategory: true });
+      const updatedCategory = await api.patch(
+        `/categories/update/${get().selectedCategory._id}`,
+        updatedFields
+      );
+      set({ selectedCategory: null });
+      toast.success("Updated category successfully");
+      return true;
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message);
+      return false;
+    } finally {
+      set({ isUpdatingCategory: false });
     }
   },
 }));

@@ -1,8 +1,9 @@
 // Models
 import Category from "../models/category.js";
 
-// cloudinary uploader
+// cloudinary
 import { uploadImage } from "../utils/uploadImage.js";
+import { deleteCloudinaryImage } from "../utils/deleteCloudinaryImage.js";
 
 export const getCategories = async (req, res) => {
   try {
@@ -10,7 +11,22 @@ export const getCategories = async (req, res) => {
 
     res.status(200).json(categories);
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ message: error });
+  }
+};
+
+export const getCategoryById = async (req, res) => {
+  const categoryId = req.params.categoryId;
+
+  try {
+    if (!categoryId) {
+      return res.status(400).json({ message: "Please provide category ID" });
+    }
+    const selectedCategory = await Category.findOne({ _id: categoryId });
+    res.status(200).json(selectedCategory);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error });
   }
 };
@@ -38,6 +54,7 @@ export const getSubCategories = async (req, res) => {
     });
     res.status(200).json(subs);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error });
   }
 };
@@ -55,10 +72,9 @@ export const createCategory = async (req, res) => {
     thumbnail,
     status,
   } = req.body;
-  console.log(parent_category.value);
-  
 
-  let thumbnailURL = null;
+  let thumbnailURL = "";
+  let thumbnailPublicID = "";
 
   try {
     if (!name || !slug) {
@@ -67,14 +83,18 @@ export const createCategory = async (req, res) => {
         .json({ message: "Please fill in all required fields" });
     }
 
-    if (thumbnail) {
-      const uploadResult = await uploadImage(thumbnail, "message-pictures");
+    if (thumbnail.url) {
+      const uploadResult = await uploadImage(
+        thumbnail.url,
+        "categories-thumbnail"
+      );
 
       if (!uploadResult.success) {
         return res.status(400).json({ message: uploadResult.error });
       }
 
       thumbnailURL = uploadResult.url;
+      thumbnailPublicID = uploadResult.publicId;
     }
 
     const newCategory = new Category({
@@ -86,14 +106,69 @@ export const createCategory = async (req, res) => {
       metaTitle,
       metaDescription,
       canonicalUrl,
-      thumbnail: thumbnailURL,
+      thumbnail: {
+        url: thumbnailURL,
+        publicId: thumbnailPublicID,
+      },
       status,
     });
     await newCategory.save();
 
     res.status(201).json("Created category successfully");
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ message: error });
+  }
+};
+
+export const updateCategoryById = async (req, res) => {
+  const categoryId = req.params.categoryId;
+  const updatedFields = req.body;
+
+  try {
+    if (!updatedFields.name || !updatedFields.slug) {
+      return res
+        .status(400)
+        .json({ message: "Please fill in all required fields" });
+    }
+
+    let isNewImage = !updatedFields.thumbnail.publicId;
+
+    if (isNewImage) {
+      const category = await Category.findOne({ _id: categoryId });
+      const toDeleteImage = category.thumbnail.publicId;
+      let deleteResult = null;
+      if (toDeleteImage) {
+        deleteResult = await deleteCloudinaryImage(toDeleteImage);
+      }
+
+      if (!deleteResult.success) {
+        return res.status(400).json({ message: deleteResult.error });
+      }
+
+
+      const uploadResult = await uploadImage(
+        updatedFields.thumbnail.url,
+        "categories-thumbnail"
+      );
+
+      if (!uploadResult.success) {
+        return res.status(400).json({ message: uploadResult.error });
+      }
+
+      updatedFields.thumbnail.url = uploadResult.url;
+      updatedFields.thumbnail.publicId = uploadResult.publicId;
+    }
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      categoryId,
+      updatedFields,
+      { new: true }
+    );
+
+    res.status(200).json(updatedCategory);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error });
   }
 };

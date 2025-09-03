@@ -18,8 +18,14 @@ const CategorySchema = new mongoose.Schema(
     metaTitle: { type: String, trim: true, maxlength: 60 },
     metaDescription: { type: String, trim: true, maxlength: 160 },
     canonicalUrl: { type: String, trim: true },
-    image: { type: String },
-    thumbnail: { type: String },
+    image: {
+      url: { type: String },
+      publicId: { type: String },
+    },
+    thumbnail: {
+      url: { type: String },
+      publicId: { type: String },
+    },
     status: { type: Boolean, default: true },
   },
   { collection: "categories", timestamps: true }
