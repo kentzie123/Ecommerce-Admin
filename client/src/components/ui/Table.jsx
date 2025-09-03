@@ -72,15 +72,15 @@ export const Table = ({ data = [], headers = [], editModalRoute }) => {
                         >
                           <Tooltip content="Edit" color="invert">
                             <Link to={`${editModalRoute}/${row._id}`}>
-                              <Button size="sm" variant="outline">
-                                <Pencil className="size-4 text-base-content/80" />
+                              <Button className="size-8 p-0" size="sm" variant="outline">
+                                <Pencil className="size-4 opacity-75" />
                               </Button>
                             </Link>
                           </Tooltip>
                           <Popover>
                             <Popover.Trigger>
-                              <Button variant="outline" size="sm">
-                                <Trash2 className="size-4 text-base-content/80" />
+                              <Button className="size-8 p-0" variant="outline" size="sm">
+                                <Trash2 className="size-4 opacity-75" />
                               </Button>
                             </Popover.Trigger>
                             <Popover.Content>
