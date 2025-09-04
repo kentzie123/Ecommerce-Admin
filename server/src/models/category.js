@@ -14,7 +14,7 @@ const CategorySchema = new mongoose.Schema(
       ref: "Category",
       default: null,
     },
-    description: { type: String, trim: true },
+    description: { type: String, trim: true, maxlength: 160 },
     metaTitle: { type: String, trim: true, maxlength: 60 },
     metaDescription: { type: String, trim: true, maxlength: 160 },
     canonicalUrl: { type: String, trim: true },

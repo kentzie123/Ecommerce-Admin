@@ -1,27 +1,63 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const ProductSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  brand: { type: String, required: true },
-  description: { type: String },
+const ProductSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true, lowercase: true },
 
-  image: [{ type: String, required: true }],
+    // Category references (3 levels)
+    mainCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true, // must have at least one category
+    },
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      default: null, // optional
+    },
+    subSubCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      default: null, // optional
+    },
 
-  category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
-  sub_parent: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
-  third_level_category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
+    description: { type: String, trim: true },
 
-  // Array of variations
-  variations: [
-    {
-      size: { type: String },            // "M", "L", "XL"
-      weight: { type: String },          // "200g", "1kg", etc.
-      price: { type: Number, required: true },
-      old_price: { type: Number, default: null },
-      stock: { type: Number, default: 0 },
-      discount: { type: Number, default: 0 }
-    }
-  ]
-}, { timestamps: true });
+    // Pricing
+    price: { type: Number, required: true },
+    discountPrice: { type: Number, default: null },
 
-module.exports = mongoose.model("Product", ProductSchema);
+    // Stock & Inventory
+    stock: { type: Number, default: 0 },
+    trackInventory: { type: Boolean, default: true },
+
+    // Images
+    images: [
+      {
+        url: { type: String, required: true },
+        publicId: { type: String },
+      },
+    ],
+    thumbnail: {
+      url: { type: String },
+      publicId: { type: String },
+    },
+
+    // SEO fields
+    metaTitle: { type: String, trim: true, maxlength: 60 },
+    metaDescription: { type: String, trim: true, maxlength: 160 },
+    canonicalUrl: { type: String, trim: true },
+
+    status: { type: Boolean, default: true }, // active/inactive
+  },
+  { collection: "products", timestamps: true }
+);
+
+// Indexes
+ProductSchema.index({ slug: 1 });
+ProductSchema.index({ status: 1 });
+ProductSchema.index({ mainCategory: 1, subCategory: 1, subSubCategory: 1 });
+
+const Product = mongoose.model("Product", ProductSchema);
+export default Product;

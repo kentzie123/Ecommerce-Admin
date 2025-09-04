@@ -264,6 +264,7 @@ const EditCategory = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
+                maxLength={160}
                 labelClassName="opacity-85"
                 label="Description"
                 error=""
@@ -284,6 +285,7 @@ const EditCategory = () => {
             <Input
               type="text"
               label="Meta Title"
+              helperText="Leave blank to use the category name as the page title (max 60 characters)"
               value={formData.metaTitle}
               onChange={(e) =>
                 setFormData({ ...formData, metaTitle: e.target.value })
@@ -292,17 +294,21 @@ const EditCategory = () => {
               suffix={formData.metaTitle.length + "/60"}
               suffixClassName="opacity-70"
             />
+
             <Textarea
               label="Meta Description"
+              helperText="Leave blank to auto-generate from the category description (max 160 characters)"
               value={formData.metaDescription}
               onChange={(e) =>
                 setFormData({ ...formData, metaDescription: e.target.value })
               }
               maxLength={160}
             />
+
             <Input
               type="text"
               label="Canonical URL"
+              helperText="Leave blank to auto-generate a canonical URL from the category slug"
               value={formData.canonicalUrl}
               onChange={(e) =>
                 setFormData({ ...formData, canonicalUrl: e.target.value })
