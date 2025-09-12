@@ -59,6 +59,21 @@ export const getSubCategories = async (req, res) => {
   }
 };
 
+export const getSubSubCategories = async (req, res) => {
+  const parentId = req.params.parentId;
+
+  try {
+    const subSubCategories = await Category.find({
+      sub_parent: parentId,
+      status: true,
+    });
+    res.status(200).json(subSubCategories);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error });
+  }
+};
+
 export const createCategory = async (req, res) => {
   const {
     name,

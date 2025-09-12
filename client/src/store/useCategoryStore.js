@@ -12,7 +12,12 @@ export const useCategoryStore = create((set, get) => ({
   categories: [],
   parentCategories: [],
   subCategories: [],
+  subSubCategories: [],
   selectedCategory: null,
+
+  setSubSubCategories: (data) => {
+    set({ subSubCategories: data });
+  },
 
   setSubCategories: (data) => {
     set({ subCategories: data });
@@ -30,7 +35,7 @@ export const useCategoryStore = create((set, get) => ({
   getCategoryById: async (categoryId) => {
     try {
       const selectedCategory = await api.get(`/categories/by-id/${categoryId}`);
-      
+
       set({ selectedCategory: selectedCategory.data });
     } catch (error) {
       console.error(error);
@@ -61,6 +66,21 @@ export const useCategoryStore = create((set, get) => ({
       }));
 
       set({ subCategories: formatted });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  getSubSubCategories: async (parentId) => {
+    try {
+      const subSubCategories = await api.get(
+        `/categories/sub-sub-categories/${parentId}`
+      );
+      const formatted = subSubCategories.data.map((cat) => ({
+        label: cat.name,
+        value: cat._id,
+      }));
+      set({ subSubCategories: formatted });
     } catch (error) {
       console.error(error);
     }
@@ -99,4 +119,27 @@ export const useCategoryStore = create((set, get) => ({
       set({ isUpdatingCategory: false });
     }
   },
+
+  // // Add these methods to your existing category store
+  // getSubCategories: async (parentId) => {
+  //   set({ isLoading: true });
+  //   try {
+  //     const response = await api.get(`/categories/${parentId}/subcategories`);
+  //     set({ subCategories: response.data, isLoading: false });
+  //   } catch (error) {
+  //     console.error("Error fetching subcategories:", error);
+  //     set({ isLoading: false });
+  //   }
+  // },
+
+  // getSubSubCategories: async (parentId) => {
+  //   set({ isLoading: true });
+  //   try {
+  //     const response = await api.get(`/categories/${parentId}/subcategories`);
+  //     set({ subSubCategories: response.data, isLoading: false });
+  //   } catch (error) {
+  //     console.error("Error fetching sub-subcategories:", error);
+  //     set({ isLoading: false });
+  //   }
+  // },
 }));

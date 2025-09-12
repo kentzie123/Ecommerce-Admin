@@ -12,6 +12,9 @@ import Categories from "./pages/Categories";
 import CreateCategory from "./pages/CreateCategory";
 import EditCategory from "./pages/EditCategory";
 import Products from "./pages/Products";
+import CreateProduct from "./pages/CreateProduct";
+import EditProduct from "./pages/EditProduct";
+import CreateProduct2 from "./pages/CreateProduct2";
 
 // Toast
 import { Toaster } from "react-hot-toast";
@@ -23,10 +26,18 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
+
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/create" element={<CreateCategory />} />
-          <Route path="/categories/edit/:categoryId" element={<EditCategory />} />
+          <Route
+            path="/categories/edit/:categoryId"
+            element={<EditCategory />}
+          />
+
           <Route path="/products" element={<Products />} />
+          <Route path="/products/create" element={<CreateProduct />} />
+          <Route path="/products/create2" element={<CreateProduct2 />} />
+          <Route path="/products/edit/:productId" element={<EditProduct />} />
         </Route>
       </Routes>
     </div>

@@ -7,10 +7,11 @@ import connectDB from "./config/db.js";
 
 // Routes
 import categoryRoutes from "./routes/category.route.js";
-
+import productRoutes from "./routes/product.route.js";
 
 
 app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
 app.get("/api/test", (req, res) => {
   res.json({ status: "OK" });
 });

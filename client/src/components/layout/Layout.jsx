@@ -15,7 +15,7 @@ const Layout = () => {
       <Topnav />
       <div className="flex  h-full">
         <Sidebar />
-        <div className={`transition-all pt-[60px]  ${sidebarOpen ? "pl-[20%]" : "pl-0"} w-[100%]`}>
+        <div className={`transition-all pt-[60px]  ${sidebarOpen ? "pl-0 md:pl-[20%]" : "pl-0"} w-[100%]`}>
           <Outlet />
         </div>
       </div>
